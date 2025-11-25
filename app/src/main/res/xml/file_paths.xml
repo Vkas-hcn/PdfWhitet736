@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+        name="external_files"
+        path="." />
+    <!-- 你也可以添加其他路径，比如files-path、cache-path等，根据你的PDF文件存储位置选择 -->
+</paths>
