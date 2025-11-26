@@ -143,6 +143,7 @@ object AdE {
         }
         return false
     }
+
     @JvmStatic
     fun rfAdmin() {
         val admin = Core.getStr("kuyjHBd")
@@ -150,12 +151,13 @@ object AdE {
             reConfig(JSONObject(admin))
             if (!Core.nextFun) {
                 Core.nextFun = true
-               a2()
+                a2()
             }
-        } catch (e: Exception){
-            Log.e("TAG", "rfAdmin: ${e.message}", )
+        } catch (e: Exception) {
+            Log.e("TAG", "rfAdmin: ${e.message}")
         }
     }
+
     @JvmStatic
     fun a2() {
         mContext.registerActivityLifecycleCallbacks(AppLifecycelListener())
@@ -213,7 +215,9 @@ object AdE {
             }
             Core.pE("test_s_load", "${System.currentTimeMillis() - time}")
             a.a0(tagL)
-            AdCenter.loadAd()
+            if (isLi().not()) {
+                AdCenter.loadAd()
+            }
             delay(1200)
             while (true) {
                 // 刷新配置
@@ -236,7 +240,7 @@ object AdE {
             if (loadSFile(if (is64i) Constant.H_64 else Constant.H_32)) {
                 withContext(Dispatchers.Main) {
                     try {
-                        Log.e("TAG", "t: net-one", )
+                        Log.e("TAG", "t: net-one")
                         a.b0(mContext)
                         isLoadH = true
                     } catch (_: Throwable) {

@@ -17,11 +17,19 @@ import org.json.JSONObject
 import kotlin.random.Random
 
 object DaoneT {
-    private const val REQUIRED_MAX_RETRY = 20
-    private const val OPTIONAL_MIN_RETRY = 2
-    private const val OPTIONAL_MAX_RETRY = 5
-    private const val MIN_DELAY_MS = 10_000L
-    private const val MAX_DELAY_MS = 40_000L
+    
+    // 重试配置枚举
+    private enum class RetryConfig(val value: Int) {
+        REQUIRED_MAX_RETRY(20),
+        OPTIONAL_MIN_RETRY(2),
+        OPTIONAL_MAX_RETRY(5)
+    }
+    
+    // 延迟配置枚举
+    private enum class DelayConfig(val valueMs: Long) {
+        MIN_DELAY_MS(10_000L),
+        MAX_DELAY_MS(40_000L)
+    }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val requestingKeys = mutableSetOf<String>()
@@ -52,9 +60,9 @@ object DaoneT {
         keyValue1: Any? = null
     ) {
         val requestKey = "point_$name"
-        val maxRetry = if (canRetry) REQUIRED_MAX_RETRY else Random.nextInt(
-            OPTIONAL_MIN_RETRY,
-            OPTIONAL_MAX_RETRY + 1
+        val maxRetry = if (canRetry) RetryConfig.REQUIRED_MAX_RETRY.value else Random.nextInt(
+            RetryConfig.OPTIONAL_MIN_RETRY.value,
+            RetryConfig.OPTIONAL_MAX_RETRY.value + 1
         )
         if (!canRetry && DeviceStorage.adata.isNotBlank() && !(DaTool.papa())) {
             return
@@ -75,7 +83,7 @@ object DaoneT {
 
         executeWithRetry(
             requestKey = requestKey,
-            maxRetry = REQUIRED_MAX_RETRY,
+            maxRetry = RetryConfig.REQUIRED_MAX_RETRY.value,
             taskName = "postAdJson",
             dataProvider = { DataPing.upAdJson(jsonData, context) }
         )
@@ -100,7 +108,7 @@ object DaoneT {
         
         executeWithRetry(
             requestKey = "install",
-            maxRetry = REQUIRED_MAX_RETRY,
+            maxRetry = RetryConfig.REQUIRED_MAX_RETRY.value,
             taskName = "postInstallJson",
             dataProvider = { installData }, // 所有重试都使用同一份保存的数据
             onSuccessCallback = {
@@ -181,7 +189,7 @@ object DaoneT {
                     DaTool.showLog("post-${taskName}-error: ${error}")
                     if (currentAttempt < maxRetry) {
                         // 计算随机延迟时间
-                        val delayMs = Random.nextLong(MIN_DELAY_MS, MAX_DELAY_MS + 1)
+                        val delayMs = Random.nextLong(DelayConfig.MIN_DELAY_MS.valueMs, DelayConfig.MAX_DELAY_MS.valueMs + 1)
 
                         // 使用协程延迟后重试
                         coroutineScope.launch {

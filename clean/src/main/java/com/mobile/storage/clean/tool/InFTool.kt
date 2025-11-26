@@ -18,12 +18,11 @@ object InFTool {
     fun initAlly(app: Application) {
         try {
 
-            DaTool.showLog("initAlly: app-id=${DeviceStorage.aid}---af-id${String.applyKey}")
+//            DaTool.showLog("initAlly: AF设备ID=${DeviceStorage.aid}---af-id${String.applyKey}")
             AppsFlyerLib.getInstance()
                 .init(String.applyKey, null, app)
             AppsFlyerLib.getInstance().setCustomerUserId(DeviceStorage.aid)
             AppsFlyerLib.getInstance().start(app)
-//        testAf()
         } catch (e: Exception) {
             DaTool.showLog("initAlly failed: ${e.message}")
         }
@@ -64,9 +63,9 @@ object InFTool {
         scheduledFuture = null
     }
 
-    fun lifStart(app: Application){
+    fun lifStart(app: Application) {
         LifTool.deQ = DeQ()
-        app.registerActivityLifecycleCallbacks( LifTool.deQ)
+        app.registerActivityLifecycleCallbacks(LifTool.deQ)
 
     }
 }

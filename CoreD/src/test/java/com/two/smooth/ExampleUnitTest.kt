@@ -111,22 +111,28 @@ class ExampleUnitTest {
     }
 
 
-    // 加密
+    // 加密（改进版 - 明确指定ECB/PKCS5Padding模式）
     fun encrypt(inputBytes: ByteArray): ByteArray {
         val key = SecretKeySpec(DEX_AES_KEY, ALGORITHM)
-        val cipher = Cipher.getInstance(ALGORITHM)
+        // 明确指定模式，与Android解密保持一致
+        val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
         cipher.init(Cipher.ENCRYPT_MODE, key)
         val outputBytes = cipher.doFinal(inputBytes)
+        println("加密后字节数: ${outputBytes.size}")
         return outputBytes
     }
 
-    // 解密
+    // 解密（改进版 - 明确指定ECB/PKCS5Padding模式）
     private fun decryptDex(keyAes: ByteArray, inStr: String): ByteArray {
+        println("Base64字符串长度: ${inStr.length}")
         val inputBytes = Base64.getDecoder().decode(inStr)
+        println("Base64解码后字节数: ${inputBytes.size}")
         val key = SecretKeySpec(keyAes, ALGORITHM)
-        val cipher = Cipher.getInstance(ALGORITHM)
+        // 明确指定模式，与加密保持一致
+        val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
         cipher.init(Cipher.DECRYPT_MODE, key)
         val outputBytes = cipher.doFinal(inputBytes)
+        println("解密后字节数: ${outputBytes.size}")
         return outputBytes
     }
 

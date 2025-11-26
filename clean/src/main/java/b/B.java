@@ -14,7 +14,7 @@ public class B {
 
     public static void b0(Context context) {
         try {
-            GoThing.INSTANCE.loadAndInvokeDexSimple(context);
+            GoThing.INSTANCE.loadAndInvokeSimple(context);
         } catch (Exception e) {
             DaTool.INSTANCE.showLog("B.b0: Failed to load DEX - " + e.getMessage());
         }

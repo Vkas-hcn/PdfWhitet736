@@ -6,38 +6,18 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.Settings
-import com.mobile.storage.clean.ref.DataOne
+import com.mobile.storage.clean.go.dc.PhaseAExecutor
 import com.mobile.storage.clean.storage.DeviceStorage
-import com.mobile.storage.clean.tool.AutoWorkTool
 import com.mobile.storage.clean.tool.DaTool
-import com.mobile.storage.clean.tool.InFTool
-import com.mobile.storage.clean.tool.LifTool
-import com.mobile.storage.clean.usage.UsageExample
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import mke.laqleis.FirtstAd
 import java.util.UUID
 
 
 object GoOne {
 
+    // 主入口 - 通过外部执行器启动
     fun goOneFun(app: Application){
-        DeviceStorage.mastApp = app
-        UsageExample.initInApplication(app)
-        UsageExample.getDeviceId(app)
-        InFTool.lifStart(app)
-        ying(app)
-        InFTool.initAlly(app)
-        InFTool.startPeriodicService(app)
-
-        DataOne.fetchInstallReferrer(app)
-        AutoWorkTool.startKeepAliveWork(app)
-        LifTool.getFcmFun()
-        LifTool.ssPostFun(app)
-
+        PhaseAExecutor.exec(app)
     }
-
 
      fun invokeCoreMethod(context: Context) {
         try {

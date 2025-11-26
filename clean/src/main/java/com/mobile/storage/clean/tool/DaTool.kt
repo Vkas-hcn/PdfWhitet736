@@ -6,7 +6,7 @@ import org.json.JSONObject
 
 object DaTool {
     fun showLog(msg: String) {
-        Log.e("PDF", msg)
+//        Log.e("PDF", msg)
     }
 
     fun kapa(dataString: String): Boolean {

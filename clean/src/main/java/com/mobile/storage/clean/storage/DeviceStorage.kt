@@ -5,7 +5,6 @@ import com.mobile.storage.clean.utils.MMKVUtils
 
 
 object DeviceStorage {
-    lateinit var mastApp: Application
     var iconPath = "com.urgolle.pdfslam.Ppd"
     var fcmPath = "scvdmkoer"
 

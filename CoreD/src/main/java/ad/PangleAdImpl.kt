@@ -2,6 +2,7 @@ package ad
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import com.appsflyer.AFAdRevenueData
 import com.appsflyer.AdRevenueScheme
 import com.appsflyer.AppsFlyerLib
@@ -123,7 +124,6 @@ class PangleAdImpl(val t: String = "") {
 
 
     private fun postValue(si: PAGAdEcpmInfo) {
-        // todo TBA上报广告 只需要填写TBA文档上的参数
         Core.postAd(Core.mApp,
             JSONObject().put("est", si.cpm.toDouble() * 1000)//ad_pre_ecpm
                 .put("spree", "USD")//currency

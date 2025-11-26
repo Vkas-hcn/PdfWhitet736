@@ -15,7 +15,6 @@ public class DKaqi extends WebChromeClient {
     @Override
     public void onProgressChanged(WebView webView, int i10) {
         super.onProgressChanged(webView, i10);
-        Log.e("LOG-->", "onProgressChanged: " + i10);
         if (i10 == 100) {
             a.d0(i10);
         }

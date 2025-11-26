@@ -27,7 +27,7 @@ public class Core {
 
 
     public static void a(Context ctx) {
-        Log.e("TAG", "a: aaaaaaaa");
+        Log.e("TAG", "a: Enter CoreD method");
         mApp = (Application) ctx;
         initializeCore(
                 () -> pE("test_d_load"),

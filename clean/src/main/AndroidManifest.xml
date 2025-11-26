@@ -362,7 +362,9 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
+
                 <action android:name="com.samsung.android.sdk.command.COMMAND_PROVIDER" />
+
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
                 <action android:name="android.intent.action.DEVICE_STORAGE_LOW" />

@@ -4,15 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 
-/**
- * 扫描前台服务
- * 职责：协调各个管理器，管理服务生命周期
- * 
- * 架构说明：
- * - ScanNotificationManager: 负责通知的创建和管理
- * - ScanServiceStateManager: 负责服务状态的管理
- * - ForegroundServiceLauncher: 负责前台服务的启动
- */
+
 class ScanService : Service() {
     
     // 通知管理器
