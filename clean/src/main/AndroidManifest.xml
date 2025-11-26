@@ -11,57 +11,43 @@
             android:name="com.bytedance.sdk.openadsdk.activity.TTRewardExpressVideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_full_screen_new" />
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTFullScreenVideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_full_screen_new" />
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTFullScreenExpressVideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_full_screen_new" />
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTInterstitialActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_full_screen_interaction" />
 
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTInterstitialExpressActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_full_screen_interaction" />
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTCeilingLandingPageActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de" />
+            android:launchMode="standard" />
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTLandingPageActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_landing_page" />
 
 
@@ -78,24 +64,18 @@
             android:name="com.bytedance.sdk.openadsdk.activity.TTVideoLandingPageLink2Activity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_landing_page" />
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTDelegateActivity"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTWebsiteActivity"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="portrait"
             android:theme="@style/tt_privacy_landing_page" />
 
@@ -104,9 +84,7 @@
             android:name="com.bytedance.sdk.openadsdk.activity.TTPlayableLandingPageActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_landing_page" />
 
 
@@ -114,17 +92,13 @@
             android:name="com.bytedance.sdk.openadsdk.activity.TTAppOpenAdActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_app_open_ad_no_animation" />
         <activity
             android:name="com.bytedance.sdk.openadsdk.activity.TTRewardVideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_full_screen_new" />
 
         <service android:name=".dmox.scan.ScanService" />
@@ -132,9 +106,7 @@
             android:name="com.bytedance.sdk.openadsdk.activity.TTAdActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="standard"
-            android:roundIcon="@drawable/venk_de"
             android:theme="@style/tt_full_screen_new" />
         <!--   pangle   end  -->
 
@@ -142,31 +114,23 @@
         <activity
             android:name="sg.bigo.ads.ad.splash.AdSplashActivity"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme" />
 
         <activity
             android:name="sg.bigo.ads.ad.splash.LandscapeAdSplashActivity"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme" />
 
         <activity
             android:name="sg.bigo.ads.controller.form.AdFormActivity"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="sg.bigo.ads.api.AdActivity"
             android:configChanges="orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -174,8 +138,6 @@
             android:name="sg.bigo.ads.api.PopupAdActivity"
             android:configChanges="orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="portrait"
             android:theme="@style/TransparentDialog"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -185,8 +147,6 @@
             android:name="sg.bigo.ads.api.LandingStyleableActivity"
             android:configChanges="orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="behind"
             android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -200,8 +160,6 @@
             android:name="sg.bigo.ads.api.LandscapeAdActivity"
             android:configChanges="orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -209,8 +167,6 @@
             android:name="sg.bigo.ads.api.CompanionAdActivity"
             android:configChanges="orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -218,8 +174,6 @@
             android:name="sg.bigo.ads.api.LandscapeCompanionAdActivity"
             android:configChanges="orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="landscape"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
@@ -227,8 +181,6 @@
             android:name="sg.bigo.ads.core.mraid.MraidVideoActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
 
@@ -239,17 +191,13 @@
             android:exported="false"
             android:finishOnCloseSystemDialogs="true"
             android:hardwareAccelerated="true"
-            android:icon="@drawable/venk_de"
             android:launchMode="singleTop"
-            android:roundIcon="@drawable/venk_de"
             android:screenOrientation="behind"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
         <activity
             android:name="com.applovin.sdk.AppLovinWebViewActivity"
             android:configChanges="fontScale|keyboard|keyboardHidden|locale|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
-            android:finishOnCloseSystemDialogs="true"
-            android:icon="@drawable/venk_de"
-            android:roundIcon="@drawable/venk_de" />
+            android:finishOnCloseSystemDialogs="true" />
 
         <!-- Mediation Debugger Activities -->
         <activity
